@@ -3,74 +3,81 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+	<title>Login Page</title>
 </head>
 <body>
 	<?php session_start(); ?>
 
-
+	<!-- Login Form -->
 	<form action="handleForm.php" method="POST">
-		<p><input type="text" placeholder="First name here" name="firstName"></p>
-		<p><input type="password" placeholder="Password here" name="password"></p>
-		<p><input type="submit" value="Login" name="submitBtn"></p>
-    </form>
-    <a href="unset.php"><p><input type="submit" value="Logout" name="logoutBtn"></p></a>
+		<table>
+			<tr>
+				<td><label for="firstName">Username:</label></td>
+				<td><input type="text" placeholder="First name here" name="firstName" id="firstName" required></td>
+			</tr>
+			<tr>
+				<td><label for="password">Password:</label></td>
+				<td><input type="password" placeholder="Password here" name="password" id="password" required></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value="Login" name="submitBtn"></td>
+			</tr>
+		</table>
+	</form>
 
+	<!-- Logout Button -->
+	<a href="unset.php"><p><input type="submit" value="Logout" name="logoutBtn"></p></a>
 
+	<!-- Display Logged-in User -->
+	<?php if (isset($_SESSION['firstName']) && $_SESSION['firstName'] !== null): ?>
+		<h2>Username: <?= htmlspecialchars($_SESSION['firstName']); ?></h2>
+        <h2>Password: <?= htmlspecialchars($_SESSION['password']); ?></h2>
+	<?php endif; ?>
 
-    <h2>
-		
-		<?php
-		if(isset($_SESSION['firstName'])) {
-			echo "<h2>User logged in: ";
-            echo $_SESSION['firstName'];
-		}
-		?>		
-	</h2>
+	<?php if (isset($_SESSION['error'])): ?>
+		<h2 style="color: black;"><?= $_SESSION['error']; ?></h2> 
+		<?php unset($_SESSION['error']); ?>
+	<?php endif; ?>
 
-	<h2>
-		
-		<?php
-		if(isset($_SESSION['password'])) {
-			echo "<h2>Password: ";
-            echo $_SESSION['password'];
-		}
-		?>		
-	</h2>
-	
 </body>
 </html>
 
 
-<?php 
 
+<?php 
 session_start();
 
-// Check if submitBtn exists
-if(isset($_POST['submitBtn'])) {
+if (isset($_POST['submitBtn'])) {
+    // Get the first name and password from the form
+    $firstName = $_POST['firstName'];
+    $password = md5($_POST['password']); 
 
-	// Get the first name from index.php
-	$firstName = $_POST['firstName'];
+    // Check if the user is already logged in
+    if (isset($_SESSION['firstName']) && $_SESSION['firstName'] === $firstName) {
+        $_SESSION['error'] = "User $firstName is already logged in! Wait for him to logout first";
+        $_SESSION['firstName'] = null;  
+    } else {
+        // Log in the user and set the session variables
+        $_SESSION['firstName'] = $firstName;
+        $_SESSION['password'] = $password;
 
-	// Get the password from the input field
-	$password = md5($_POST['password']);
+        unset($_SESSION['error']);
+    }
 
-	// Set the session variables
-	$_SESSION['firstName'] = $firstName;
-	$_SESSION['password'] = $password;
-
-	// Go back to index.php
-	header('Location: index2.php');
-} elseif($firstName ==$_SESSION['firstName'] &&  $password == $_SESSION['password'] ){
-    echo "account is already logged in";
+    // Redirect to index2.php
+    header('Location: index2.php');
+    exit; // Always exit after a redirect to stop further script execution
 }
-
 ?>
 
 
+<?php
+session_start();
+session_unset(); // Clear all session variables
+session_destroy(); // Destroy the session completely
 
-<?php  
-session_start(); // Establish connection to the current session
-session_unset(); // Delete all session variables
-header('Location: index2.php'); // Go back to homepage
+// Redirect back to the login page
+header('Location: index2.php');
+exit; // Always exit after a redirect
 ?>
+
