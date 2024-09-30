@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Order Form</title>
+</head>
+<body>
+
+	<h1 style="font-size: 36px;">Menu</h1>
+	<table border="1" style="width: 50%; font-size: 24px;">
+		<tr>
+			<th>Item</th>
+			<th>Price (PHP)</th>
+		</tr>
+		<tr>
+			<td>Burger</td>
+			<td>50</td>
+		</tr>
+		<tr>
+			<td>Fries</td>
+			<td>75</td>
+		</tr>
+		<tr>
+			<td>Steak</td>
+			<td>150</td>
+		</tr>
+	</table>
+
+	<h2 style="font-size: 28px;">Place Your Order</h2>
+	<form action="handleOrder.php" method="POST">
+		<p>
+			<label for="item" style="font-size: 24px;">Select an item:</label>
+			<select name="item" id="item" required style="font-size: 24px;">
+				<option value="">--Select an item--</option>
+				<option value="Burger">Burger</option>
+				<option value="Fries">Fries</option>
+				<option value="Steak">Steak</option>
+			</select>
+		</p>
+		<p>
+			<label for="quantity" style="font-size: 24px;">Quantity:</label>
+			<input type="number" name="quantity" id="quantity" min="1" required style="font-size: 24px;">
+		</p>
+		<p>
+			<label for="money" style="font-size: 24px;">Your Money (PHP):</label>
+			<input type="number" name="money" id="money" min="0" required style="font-size: 24px;">
+		</p>
+		<p>
+			<input type="submit" value="Submit Order" style="font-size: 24px;">
+		</p>
+	</form>
+
+</body>
+</html>
+
+
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $item = $_POST['item'];
+    $quantity = $_POST['quantity'];
+    $money = $_POST['money'];
+
+    $prices = [
+        "Burger" => 50,
+        "Fries" => 75,
+        "Steak" => 150,
+    ];
+
+    $totalCost = $prices[$item] * $quantity;
+    $orderTime = date("m/d/Y h:i:s A");
+
+    if ($money >= $totalCost) {
+        $change = $money - $totalCost;
+        echo "<h2 style='font-size: 36px; text-align: center;'>RECEIPT</h2>";
+        echo "<h2 style='font-size: 24px;'>Total Price: PHP $totalCost</h2>";
+        echo "<h2 style='font-size: 24px;'>You Paid: $money</h2>";
+        echo "<h2 style='font-size: 24px;'>Change: PHP $change</h2>";
+        echo "<h2 style='font-size: 24px;'>$orderTime</h2>"; 
+    } else {
+        echo "<h2=3 style='font-size: 36px;'>Sorry, balance not enough!</h3>";
+        
+    }
+}
+?>
